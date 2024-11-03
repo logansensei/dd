@@ -3,38 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Dork Generator</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Google Dork Finder</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+        .container {
+            margin-top: 50px;
+            max-width: 600px;
+        }
+        .dork-list {
+            margin-top: 20px;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .dork-item {
+            padding: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .dork-item:hover {
+            background-color: #e2e6ea;
+        }
+        .btn-primary {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Google Dork Generator</h1>
-            <p>Enter your domain below to customize the dorks:</p>
-            <input type="text" id="domainInput" placeholder="Enter your domain (e.g., targetdomain.com)">
-            <button id="replaceButton">Replace Domain</button>
-        </header>
-        <div id="dorkList" class="dork-list">
-            <h2>Available Google Dorks</h2>
-            <div class="dork">
-                <h3>Staging Environment Find</h3>
-                <p class="dork-link" data-dork="site:*.targetdomain.com -www (inurl:staging OR inurl:dev OR inurl:test OR inurl:preprod OR inurl:internal) (intext:&quot;environment&quot; OR intext:&quot;application&quot; OR intext:&quot;version&quot;)">site:*.targetdomain.com -www (inurl:staging OR inurl:dev OR inurl:test OR inurl:preprod OR inurl:internal) (intext:"environment" OR intext:"application" OR intext:"version")</p>
-            </div>
-            <div class="dork">
-                <h3>Logs and Debug Infos</h3>
-                <p class="dork-link" data-dork="site:targetdomain.com (inurl:&quot;/logs/&quot; OR inurl:&quot;debug.log&quot; OR inurl:&quot;error.log&quot;) (&quot;index of&quot; OR &quot;log&quot; OR &quot;trace&quot;)">site:targetdomain.com (inurl:"/logs/" OR inurl:"debug.log" OR inurl:"error.log") ("index of" OR "log" OR "trace")</p>
-            </div>
-            <div class="dork">
-                <h3>Exposed Docker Hub Configuration Files</h3>
-                <p class="dork-link" data-dork="site:hub.docker.com intext:&quot;targetdomain.com&quot; (intext:&quot;env&quot; OR intext:&quot;docker-compose.yml&quot; OR intext:&quot;configuration&quot;) -github.com">site:hub.docker.com intext:"targetdomain.com" (intext:"env" OR intext:"docker-compose.yml" OR intext:"configuration") -github.com</p>
-            </div>
-            <div class="dork">
-                <h3>Public Zenoss Monitoring Dashboards</h3>
-                <p class="dork-link" data-dork="site:targetdomain.com inurl:&quot;/zport/dmd/&quot; OR inurl:&quot;/zenoss/&quot; intitle:&quot;Zenoss&quot; OR intitle:&quot;Zenoss Dashboard&quot; OR intext:&quot;Zenoss Monitoring&quot;">site:targetdomain.com inurl:"/zport/dmd/" OR inurl:"/zenoss/" intitle:"Zenoss" OR intitle:"Zenoss Dashboard" OR intext:"Zenoss Monitoring"</p>
-            </div>
-            <!-- Add more dorks as needed -->
-        </div>
+
+<div class="container">
+    <h1 class="text-center">Google Dork Finder</h1>
+    <div class="mb-3">
+        <label for="domainInput" class="form-label">Enter Domain:</label>
+        <input type="text" class="form-control" id="domainInput" placeholder="e.g., example.com">
     </div>
-    <script src="script.js"></script>
+    <button class="btn btn-primary" id="replaceButton">Replace Domain</button>
+
+    <div class="list-group dork-list" id="dorkList"></div>
+</div>
+
+<script>
+    const dorks = [
+        "Staging env find\nsite:*.targetdomain.com -www (inurl:staging OR inurl:dev OR inurl:test OR inurl:preprod OR inurl:internal) (intext:\"environment\" OR intext:\"application\" OR intext:\"version\")",
+        "logs and debug infos\nsite:targetdomain.com (inurl:\"/logs/\" OR inurl:\"debug.log\" OR inurl:\"error.log\") (\"index of\" OR \"log\" OR \"trace\")",
+        "Discovering Publicly Indexed Git Directories\nsite:targetdomain.com inurl:\"/.git\" (\"index of\" OR inurl:\"/.env\") (\"repository\" OR \"config\" OR \"branch\")",
+        // Add all your dorks here...
+        "Publicly Accessible Amazon RDS Snapshots\nsite:aws.amazon.com inurl:\"/rds/\" intitle:\"RDS snapshot\" intext:\"targetdomain.com\" OR intext:\"snapshot\" OR intext:\"public\"",
+        "Google Drive Shared Documents with Sensitive Terms\nsite:drive.google.com intext:\"targetdomain.com\" (\"password\" OR \"credentials\" OR \"confidential\" OR \"secret\")"
+    ];
+
+    const dorkListElement = document.getElementById('dorkList');
+
+    function populateDorkList() {
+        dorks.forEach(dork => {
+            const dorkItem = document.createElement('div');
+            dorkItem.className = 'list-group-item dork-item';
+            dorkItem.textContent = dork;
+            dorkItem.addEventListener('click', () => {
+                const domain = document.getElementById('domainInput').value || 'targetdomain.com';
+                const dorkWithDomain = dork.replace(/targetdomain\.com/g, domain);
+                const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(dorkWithDomain)}`;
+                window.open(googleSearchUrl, '_blank');
+            });
+            dorkListElement.appendChild(dorkItem);
+        });
+    }
+
+    document.getElementById('replaceButton').addEventListener('click', () => {
+        dorkListElement.innerHTML = ''; // Clear current list
+        populateDorkList(); // Populate with updated domain
+    });
+
+    populateDorkList(); // Initial population
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
