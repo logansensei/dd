@@ -71,4 +71,10 @@ button:hover {
     font-size: 1em;
     margin: 5px 0;
     line-height: 1.5;
+    cursor: pointer;
+}
+
+.dork p:hover {
+    text-decoration: underline;
+    color: #4CAF50;
 }
