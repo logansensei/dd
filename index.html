@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Dork Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .dork-list {
+            margin-top: 20px;
+        }
+        .dork-item {
+            background: #ffffff;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Google Dork Tool</h1>
+    <input type="text" id="domainInput" placeholder="Enter your domain (e.g., targetdomain.com)">
+    <button id="replaceButton">Replace All</button>
+
+    <div class="dork-list" id="dorkList">
+        <!-- Dorks will be dynamically populated here -->
+    </div>
+
+    <script>
+        const dorks = [
+            'site:{{DOMAIN}} -www inurl:staging | inurl:dev | inurl:test | inurl:preprod | inurl:internal',
+            'site:{{DOMAIN}} inurl:"/logs/" | inurl:"debug.log" | inurl:"error.log" "index of"',
+            'site:{{DOMAIN}} inurl:"/.git" "index of" | inurl:"/.env"',
+            'site:{{DOMAIN}} intitle:"index of" "uploads" | "files" | "private" | "userdata"',
+            'site:{{DOMAIN}} inurl:"/jira/" "exception" | "error" | "stack trace"',
+            'site:{{DOMAIN}} inurl:".ssh" | inurl:".aws" | inurl:".npmrc" | inurl:".docker" | inurl:".gitlab-ci.yml"',
+            'site:{{DOMAIN}} filetype:log "error" | "warning" | "failed to" -example -sample',
+            'site:{{DOMAIN}} ext:yaml "kubernetes" | "cluster" | "apiVersion"'
+        ];
+
+        document.getElementById('replaceButton').addEventListener('click', function() {
+            const domain = document.getElementById('domainInput').value.trim();
+            const dorkListElement = document.getElementById('dorkList');
+            dorkListElement.innerHTML = '';
+
+            if (domain) {
+                dorks.forEach(dork => {
+                    const updatedDork = dork.replace(/{{DOMAIN}}/g, domain);
+                    const dorkItem = document.createElement('div');
+                    dorkItem.className = 'dork-item';
+                    dorkItem.innerText = updatedDork;
+                    dorkItem.onclick = function() {
+                        window.open(`https://www.google.com/search?q=${encodeURIComponent(updatedDork)}`, '_blank');
+                    };
+                    dorkListElement.appendChild(dorkItem);
+                });
+            } else {
+                alert('Please enter a domain name.');
+            }
+        });
+    </script>
+
+</body>
+</html>
