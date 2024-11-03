@@ -98,9 +98,22 @@
             <li><a href="#" class="dork-link">Public Nagios Monitoring Interfaces</a></li>
             <li><a href="#" class="dork-link">Public SonarQube Scans with Vulnerability Information</a></li>
             <li><a href="#" class="dork-link">Open Prometheus Monitoring Interfaces</a></li>
-
         </ul>
     </div>
+
+    <script>
+        document.getElementById('replaceButton').addEventListener('click', () => {
+            const domain = document.getElementById('domainInput').value;
+            if (domain) {
+                const dorkLinks = document.querySelectorAll('.dork-link');
+                dorkLinks.forEach(link => {
+                    const dorkText = link.textContent;
+                    link.href = `https://www.google.com/search?q=site:${domain} ${encodeURIComponent(dorkText)}`;
+                    link.target = "_blank";
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>
