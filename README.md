@@ -1,1 +1,1 @@
-<a href = https://example/com> clcik here
+<a href = https://logansensei.github.io/godsensei.github.io/> Website
