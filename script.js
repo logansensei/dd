@@ -1,5 +1,5 @@
 document.getElementById('replaceButton').addEventListener('click', () => {
-    const domain = document.getElementById('domainInput').value;
+    const domain = document.getElementById('domainInput').value.trim();
     const dorks = [
         'site:*.targetdomain.com -www (inurl:staging OR inurl:dev OR inurl:test OR inurl:preprod OR inurl:internal) (intext:"environment" OR intext:"application" OR intext:"version")',
         'site:targetdomain.com (inurl:"/logs/" OR inurl:"debug.log" OR inurl:"error.log") ("index of" OR "log" OR "trace")',
@@ -17,13 +17,19 @@ document.getElementById('replaceButton').addEventListener('click', () => {
     const dorkList = document.getElementById('dorkList');
     dorkList.innerHTML = ''; // Clear existing dorks
 
+    if (domain === '') {
+        alert('Please enter a domain');
+        return;
+    }
+
     dorks.forEach(dork => {
+        const updatedDork = dork.replace(/targetdomain\.com/g, domain);
         const listItem = document.createElement('li');
         const link = document.createElement('a');
-        link.href = `https://www.google.com/search?q=${encodeURIComponent(dork.replace(/targetdomain\.com/g, domain))}`;
+        link.href = `https://www.google.com/search?q=${encodeURIComponent(updatedDork)}`;
         link.target = "_blank"; // Open in a new tab
         link.className = 'dork-link';
-        link.textContent = dork;
+        link.textContent = updatedDork;
         listItem.appendChild(link);
         dorkList.appendChild(listItem);
     });
