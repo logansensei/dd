@@ -1,80 +1,73 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    color: #333;
-    margin: 0;
-    padding: 0;
+* {
+    box-sizing: border-box;
 }
 
-.container {
-    width: 90%;
-    max-width: 1200px;
-    margin: 0 auto;
+body {
+    background-color: #121212;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    margin: 0;
     padding: 20px;
 }
 
-header {
+.container {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #1e1e1e;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+h1 {
     text-align: center;
-    margin-bottom: 30px;
 }
 
-header h1 {
-    font-size: 2.5em;
-    color: #4CAF50;
-}
-
-header p {
-    font-size: 1.2em;
-    margin-bottom: 10px;
+.input-group {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
 }
 
 input[type="text"] {
+    flex: 1;
     padding: 10px;
-    font-size: 1em;
-    width: 50%;
-    margin-right: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    border: none;
+    border-radius: 4px 0 0 4px;
+    font-size: 16px;
 }
 
 button {
     padding: 10px 20px;
-    font-size: 1em;
-    color: white;
-    background-color: #4CAF50;
     border: none;
-    border-radius: 4px;
+    border-radius: 0 4px 4px 0;
+    background-color: #6200ea;
+    color: white;
     cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
 }
 
 button:hover {
-    background-color: #45a049;
+    background-color: #3700b3;
 }
 
-.dork-list {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+ul {
+    list-style-type: none;
+    padding: 0;
 }
 
-.dork {
-    margin-bottom: 20px;
-}
-
-.dork h3 {
-    font-size: 1.5em;
-    color: #2196F3;
-}
-
-.dork p {
-    font-size: 1em;
+.dork-link {
+    display: block;
+    background-color: #333;
+    color: white;
+    padding: 10px;
     margin: 5px 0;
-    line-height: 1.5;
-    cursor: pointer;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.3s;
 }
 
-.dork p:hover {
-    text-decoration: underline;
-    color: #4CAF50;
+.dork-link:hover {
+    background-color: #444;
 }
