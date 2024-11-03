@@ -25,8 +25,11 @@
         button:hover {
             background-color: #45a049;
         }
-        .dork-list {
+        .dork-category {
             margin-top: 20px;
+        }
+        .dork-list {
+            margin-top: 10px;
         }
         .dork-item {
             background: #ffffff;
@@ -43,38 +46,66 @@
     <input type="text" id="domainInput" placeholder="Enter your domain (e.g., targetdomain.com)">
     <button id="replaceButton">Replace All</button>
 
-    <div class="dork-list" id="dorkList">
-        <!-- Dorks will be dynamically populated here -->
-    </div>
+    <div class="dork-category" id="dorkListContainer"></div>
 
     <script>
-        const dorks = [
-            'site:{{DOMAIN}} -www inurl:staging | inurl:dev | inurl:test | inurl:preprod | inurl:internal',
-            'site:{{DOMAIN}} inurl:"/logs/" | inurl:"debug.log" | inurl:"error.log" "index of"',
-            'site:{{DOMAIN}} inurl:"/.git" "index of" | inurl:"/.env"',
-            'site:{{DOMAIN}} intitle:"index of" "uploads" | "files" | "private" | "userdata"',
-            'site:{{DOMAIN}} inurl:"/jira/" "exception" | "error" | "stack trace"',
-            'site:{{DOMAIN}} inurl:".ssh" | inurl:".aws" | inurl:".npmrc" | inurl:".docker" | inurl:".gitlab-ci.yml"',
-            'site:{{DOMAIN}} filetype:log "error" | "warning" | "failed to" -example -sample',
-            'site:{{DOMAIN}} ext:yaml "kubernetes" | "cluster" | "apiVersion"'
-        ];
+        const dorkCategories = {
+            "Staging Environments": [
+                'site:{{DOMAIN}} -www inurl:staging | inurl:dev | inurl:test | inurl:preprod | inurl:internal'
+            ],
+            "Logs and Debug Information": [
+                'site:{{DOMAIN}} inurl:"/logs/" | inurl:"debug.log" | inurl:"error.log" "index of"'
+            ],
+            "Git Directories": [
+                'site:{{DOMAIN}} inurl:"/.git" "index of" | inurl:"/.env"'
+            ],
+            "Directory Listings": [
+                'site:{{DOMAIN}} intitle:"index of" "uploads" | "files" | "private" | "userdata"'
+            ],
+            "JIRA Tickets": [
+                'site:{{DOMAIN}} inurl:"/jira/" "exception" | "error" | "stack trace"'
+            ],
+            "Sensitive Files": [
+                'site:{{DOMAIN}} inurl:".ssh" | inurl:".aws" | inurl:".npmrc" | inurl:".docker" | inurl:".gitlab-ci.yml"'
+            ],
+            "Error Logs": [
+                'site:{{DOMAIN}} filetype:log "error" | "warning" | "failed to" -example -sample'
+            ],
+            "Kubernetes Configurations": [
+                'site:{{DOMAIN}} ext:yaml "kubernetes" | "cluster" | "apiVersion"'
+            ]
+        };
 
         document.getElementById('replaceButton').addEventListener('click', function() {
             const domain = document.getElementById('domainInput').value.trim();
-            const dorkListElement = document.getElementById('dorkList');
-            dorkListElement.innerHTML = '';
+            const dorkListContainer = document.getElementById('dorkListContainer');
+            dorkListContainer.innerHTML = '';
 
             if (domain) {
-                dorks.forEach(dork => {
-                    const updatedDork = dork.replace(/{{DOMAIN}}/g, domain);
-                    const dorkItem = document.createElement('div');
-                    dorkItem.className = 'dork-item';
-                    dorkItem.innerText = updatedDork;
-                    dorkItem.onclick = function() {
-                        window.open(`https://www.google.com/search?q=${encodeURIComponent(updatedDork)}`, '_blank');
-                    };
-                    dorkListElement.appendChild(dorkItem);
-                });
+                for (const [category, dorks] of Object.entries(dorkCategories)) {
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.className = 'dork-category';
+                    const categoryHeading = document.createElement('h2');
+                    categoryHeading.innerText = category;
+                    categoryDiv.appendChild(categoryHeading);
+
+                    const dorkList = document.createElement('div');
+                    dorkList.className = 'dork-list';
+
+                    dorks.forEach(dork => {
+                        const updatedDork = dork.replace(/{{DOMAIN}}/g, domain);
+                        const dorkItem = document.createElement('div');
+                        dorkItem.className = 'dork-item';
+                        dorkItem.innerText = updatedDork;
+                        dorkItem.onclick = function() {
+                            window.open(`https://www.google.com/search?q=${encodeURIComponent(updatedDork)}`, '_blank');
+                        };
+                        dorkList.appendChild(dorkItem);
+                    });
+
+                    categoryDiv.appendChild(dorkList);
+                    dorkListContainer.appendChild(categoryDiv);
+                }
             } else {
                 alert('Please enter a domain name.');
             }
