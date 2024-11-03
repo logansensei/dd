@@ -4,82 +4,103 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Google Dork Finder</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
-            background-color: #f8f9fa;
-            color: #212529;
+            font-family: 'Roboto', sans-serif;
+            background-color: #121212; /* Dark theme background */
+            color: #E0E0E0; /* Light text for readability */
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        .container {
-            margin-top: 50px;
+        h1 {
+            color: #FFEA00; /* Bright accent color for header */
+        }
+        input[type="text"] {
+            width: 100%;
             max-width: 600px;
-        }
-        .dork-list {
-            margin-top: 20px;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        .dork-item {
             padding: 10px;
+            border: none;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            background-color: #1E1E1E; /* Input background */
+            color: #E0E0E0; /* Input text color */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        input[type="button"] {
+            background-color: #FFEA00; /* Button background */
+            color: #121212; /* Button text */
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: background-color 0.3s, transform 0.3s;
+            font-weight: bold;
         }
-        .dork-item:hover {
-            background-color: #e2e6ea;
+        input[type="button"]:hover {
+            background-color: #FFC107; /* Darker yellow on hover */
+            transform: scale(1.05); /* Slightly grow on hover */
         }
-        .btn-primary {
+        #output {
+            width: 100%;
+            max-width: 600px;
+            background-color: #1E1E1E; /* Output background */
+            padding: 10px;
+            border-radius: 5px;
             margin-top: 20px;
+            overflow-x: auto; /* Allow horizontal scrolling */
+            white-space: pre-wrap; /* Preserve whitespace */
+            max-height: 400px; /* Limit output height */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        #dorkList {
+            display: none; /* Hide by default */
         }
     </style>
 </head>
 <body>
+    <h1>Google Dork Finder</h1>
+    <input type="text" id="domain" placeholder="Enter your domain (e.g., targetdomain.com)">
+    <input type="button" value="Generate Dorks" onclick="generateDorks()">
+    <input type="button" value="Replace" onclick="replaceDomain()">
+    <div id="output"></div>
 
-<div class="container">
-    <h1 class="text-center">Google Dork Finder</h1>
-    <div class="mb-3">
-        <label for="domainInput" class="form-label">Enter Domain:</label>
-        <input type="text" class="form-control" id="domainInput" placeholder="e.g., example.com">
-    </div>
-    <button class="btn btn-primary" id="replaceButton">Replace Domain</button>
+    <script>
+        const dorks = [
+            'site:*.targetdomain.com -www (inurl:staging OR inurl:dev OR inurl:test OR inurl:preprod OR inurl:internal) (intext:"environment" OR intext:"application" OR intext:"version")',
+            'site:targetdomain.com (inurl:"/logs/" OR inurl:"debug.log" OR inurl:"error.log") ("index of" OR "log" OR "trace")',
+            // Add all other dorks here...
+            'site:drive.google.com intext:"targetdomain.com" ("password" OR "credentials" OR "confidential" OR "secret")'
+        ];
 
-    <div class="list-group dork-list" id="dorkList"></div>
-</div>
-
-<script>
-    const dorks = [
-        "Staging env find\nsite:*.targetdomain.com -www (inurl:staging OR inurl:dev OR inurl:test OR inurl:preprod OR inurl:internal) (intext:\"environment\" OR intext:\"application\" OR intext:\"version\")",
-        "logs and debug infos\nsite:targetdomain.com (inurl:\"/logs/\" OR inurl:\"debug.log\" OR inurl:\"error.log\") (\"index of\" OR \"log\" OR \"trace\")",
-        "Discovering Publicly Indexed Git Directories\nsite:targetdomain.com inurl:\"/.git\" (\"index of\" OR inurl:\"/.env\") (\"repository\" OR \"config\" OR \"branch\")",
-        // Add all your dorks here...
-        "Publicly Accessible Amazon RDS Snapshots\nsite:aws.amazon.com inurl:\"/rds/\" intitle:\"RDS snapshot\" intext:\"targetdomain.com\" OR intext:\"snapshot\" OR intext:\"public\"",
-        "Google Drive Shared Documents with Sensitive Terms\nsite:drive.google.com intext:\"targetdomain.com\" (\"password\" OR \"credentials\" OR \"confidential\" OR \"secret\")"
-    ];
-
-    const dorkListElement = document.getElementById('dorkList');
-
-    function populateDorkList() {
-        dorks.forEach(dork => {
-            const dorkItem = document.createElement('div');
-            dorkItem.className = 'list-group-item dork-item';
-            dorkItem.textContent = dork;
-            dorkItem.addEventListener('click', () => {
-                const domain = document.getElementById('domainInput').value || 'targetdomain.com';
-                const dorkWithDomain = dork.replace(/targetdomain\.com/g, domain);
-                const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(dorkWithDomain)}`;
-                window.open(googleSearchUrl, '_blank');
+        function generateDorks() {
+            const domain = document.getElementById('domain').value;
+            const outputDiv = document.getElementById('output');
+            outputDiv.innerHTML = ''; // Clear previous output
+            dorks.forEach(dork => {
+                const formattedDork = dork.replace(/targetdomain\.com/g, domain);
+                const dorkElement = document.createElement('div');
+                dorkElement.textContent = formattedDork;
+                dorkElement.style.cursor = 'pointer';
+                dorkElement.style.marginBottom = '5px';
+                dorkElement.onclick = () => {
+                    window.open(`https://www.google.com/search?q=${encodeURIComponent(formattedDork)}`, '_blank');
+                };
+                outputDiv.appendChild(dorkElement);
             });
-            dorkListElement.appendChild(dorkItem);
-        });
-    }
+        }
 
-    document.getElementById('replaceButton').addEventListener('click', () => {
-        dorkListElement.innerHTML = ''; // Clear current list
-        populateDorkList(); // Populate with updated domain
-    });
-
-    populateDorkList(); // Initial population
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+        function replaceDomain() {
+            const domain = document.getElementById('domain').value;
+            const outputDiv = document.getElementById('output');
+            const dorkElements = outputDiv.querySelectorAll('div');
+            dorkElements.forEach(dorkElement => {
+                dorkElement.textContent = dorkElement.textContent.replace(/targetdomain\.com/g, domain);
+            });
+        }
+    </script>
 </body>
 </html>
