@@ -3,67 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Dork Finder</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 20px;
-        }
-        h2 {
-            margin-top: 20px;
-        }
-        .dork {
-            margin-bottom: 15px;
-        }
-        .dork-title {
-            font-weight: bold;
-        }
-        .replace-button {
-            margin-bottom: 20px;
-            padding: 10px 15px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-    </style>
+    <title>Google Dork Generator</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Google Dorking Tool</h1>
-    <input type="text" id="domain-input" placeholder="Enter your domain" />
-    <button class="replace-button" onclick="replaceDomain()">Replace</button>
-    <div id="dork-list">
-        <!-- Dorks will be displayed here -->
+    <div class="container">
+        <header>
+            <h1>Google Dork Generator</h1>
+            <p>Enter your domain below to customize the dorks:</p>
+            <input type="text" id="domainInput" placeholder="Enter your domain (e.g., targetdomain.com)">
+            <button id="replaceButton">Replace Domain</button>
+        </header>
+        <div id="dorkList" class="dork-list">
+            <h2>Available Google Dorks</h2>
+            <div class="dork">
+                <h3>Staging Environment Find</h3>
+                <p>site:*.targetdomain.com -www (inurl:staging OR inurl:dev OR inurl:test OR inurl:preprod OR inurl:internal) (intext:"environment" OR intext:"application" OR intext:"version")</p>
+            </div>
+            <div class="dork">
+                <h3>Logs and Debug Infos</h3>
+                <p>site:targetdomain.com (inurl:"/logs/" OR inurl:"debug.log" OR inurl:"error.log") ("index of" OR "log" OR "trace")</p>
+            </div>
+            <!-- Repeat similar structure for all dorks -->
+            <div class="dork">
+                <h3>Exposed Docker Hub Configuration Files</h3>
+                <p>site:hub.docker.com intext:"targetdomain.com" (intext:"env" OR intext:"docker-compose.yml" OR intext:"configuration") -github.com</p>
+            </div>
+            <div class="dork">
+                <h3>Public Zenoss Monitoring Dashboards</h3>
+                <p>site:targetdomain.com inurl:"/zport/dmd/" OR inurl:"/zenoss/" intitle:"Zenoss" OR intitle:"Zenoss Dashboard" OR intext:"Zenoss Monitoring"</p>
+            </div>
+            <!-- Add more dorks as needed -->
+        </div>
     </div>
-
-    <script>
-        const dorks = {
-            "Staging env find": `site:*.targetdomain.com -www (inurl:staging OR inurl:dev OR inurl:test OR inurl:preprod OR inurl:internal) (intext:"environment" OR intext:"application" OR intext:"version")`,
-            "Logs and debug infos": `site:targetdomain.com (inurl:"/logs/" OR inurl:"debug.log" OR inurl:"error.log") ("index of" OR "log" OR "trace")`,
-            // Add all other dorks here
-            "SignalFX Dashboards": `site:targetdomain.com inurl:"/signalfx" OR inurl:"/signalfx/dashboard" OR inurl:"/signalfx/public" OR inurl:"/signalfx/app" intitle:"SignalFX"`
-        };
-
-        function displayDorks(domain = "targetdomain.com") {
-            const dorkList = document.getElementById('dork-list');
-            dorkList.innerHTML = ""; // Clear previous dorks
-
-            for (const [title, dork] of Object.entries(dorks)) {
-                const dorkElement = document.createElement('div');
-                dorkElement.classList.add('dork');
-                dorkElement.innerHTML = `<span class="dork-title">${title}:</span> ${dork.replace(/targetdomain\.com/g, domain)}`;
-                dorkList.appendChild(dorkElement);
-            }
-        }
-
-        function replaceDomain() {
-            const inputDomain = document.getElementById('domain-input').value;
-            displayDorks(inputDomain);
-        }
-
-        // Initial display with default domain
-        displayDorks();
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
