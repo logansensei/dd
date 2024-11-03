@@ -3,114 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Dork Tool</title>
+    <title>Google Dork Generator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            padding: 20px;
+            margin: 20px;
             background-color: #f4f4f4;
         }
+        h1 {
+            color: #333;
+        }
         input[type="text"] {
-            width: 100%;
             padding: 10px;
-            margin-bottom: 10px;
+            width: 300px;
         }
         button {
-            padding: 10px;
-            background-color: #4CAF50;
+            padding: 10px 15px;
+            background-color: #007BFF;
             color: white;
             border: none;
             cursor: pointer;
         }
         button:hover {
-            background-color: #45a049;
+            background-color: #0056b3;
         }
-        .dork-category {
-            margin-top: 20px;
+        ul {
+            list-style-type: none;
+            padding: 0;
         }
-        .dork-list {
-            margin-top: 10px;
+        li {
+            margin: 10px 0;
         }
-        .dork-item {
-            background: #ffffff;
-            padding: 10px;
-            margin: 5px 0;
-            border: 1px solid #ccc;
-            cursor: pointer;
+        a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+        a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
 
-    <h1>Google Dork Tool</h1>
-    <input type="text" id="domainInput" placeholder="Enter your domain (e.g., targetdomain.com)">
-    <button id="replaceButton">Replace All</button>
+    <h1>Google Dork Generator</h1>
+    <p>Enter your domain below:</p>
+    <input type="text" id="domainInput" placeholder="Enter your domain (e.g., example.com)">
+    <button id="replaceButton">Replace</button>
 
-    <div class="dork-category" id="dorkListContainer"></div>
+    <h2>Google Dorks:</h2>
+    <ul id="dorkList">
+        <li><a href="#" data-dork="site:*.targetdomain.com -www (inurl:staging OR inurl:dev OR inurl:test OR inurl:preprod OR inurl:internal) (intext:&quot;environment&quot; OR intext:&quot;application&quot; OR intext:&quot;version&quot;)">Staging env find</a></li>
+        <li><a href="#" data-dork="site:targetdomain.com (inurl:&quot;/logs/&quot; OR inurl:&quot;debug.log&quot; OR inurl:&quot;error.log&quot;) (&quot;index of&quot; OR &quot;log&quot; OR &quot;trace&quot;)">Logs and debug infos</a></li>
+        <li><a href="#" data-dork="site:targetdomain.com inurl:&quot;/.git&quot; (&quot;index of&quot; OR inurl:&quot;/.env&quot;) (&quot;repository&quot; OR &quot;config&quot; OR &quot;branch&quot;)">Discovering Publicly Indexed Git Directories</a></li>
+        <li><a href="#" data-dork="site:targetdomain.com intitle:&quot;index of&quot; (&quot;uploads&quot; OR &quot;files&quot; OR &quot;private&quot; OR &quot;userdata&quot; OR &quot;backups&quot;)">Directory Listing Enabled on Uncommon Folders</a></li>
+        <li><a href="#" data-dork="site:targetdomain.com inurl:&quot;/jira/&quot; (&quot;exception&quot; OR &quot;error&quot; OR &quot;stack trace&quot; OR &quot;debug&quot;)">JIRA Tickets with Debug Information</a></li>
+        <li><a href="#" data-dork="site:targetdomain.com (inurl:&quot;.ssh&quot; OR inurl:&quot;.aws&quot; OR inurl:&quot;.npmrc&quot; OR inurl:&quot;.docker&quot; OR inurl:&quot;.gitlab-ci.yml&quot;) (&quot;private&quot; OR &quot;credentials&quot; OR &quot;secret&quot;)">Sensitive Files in Web Server Directories</a></li>
+        <li><a href="#" data-dork="site:targetdomain.com filetype:log (&quot;error&quot; OR &quot;warning&quot; OR &quot;failed to&quot; OR &quot;exception&quot;) -example -sample -test">Error Logs Exposing Server Details</a></li>
+        <li><a href="#" data-dork="site:targetdomain.com ext:yaml (&quot;kubernetes&quot; OR &quot;cluster&quot; OR &quot;apiVersion&quot; OR &quot;deployment&quot; OR &quot;service&quot;)">Kubernetes Configuration or Cluster Information</a></li>
+        <li><a href="#" data-dork="site:trello.com inurl:targetdomain.com (&quot;password&quot; OR &quot;credentials&quot; OR &quot;access&quot; OR &quot;API_KEY&quot;)">Public Trello Boards with Sensitive Info</a></li>
+        <li><a href="#" data-dork="site:targetdomain.com (inurl:&quot;Dockerfile&quot; OR inurl:&quot;docker-compose.yml&quot; OR inurl:&quot;.gitlab-ci.yml&quot; OR inurl:&quot;Jenkinsfile&quot;) (intext:&quot;version&quot; OR intext:&quot;image&quot; OR intext:&quot;build&quot;)">Exposed Docker and CI/CD Files</a></li>
+        <li><a href="#" data-dork="site:targetdomain.com filetype:js (&quot;AWS_SECRET_ACCESS_KEY&quot; OR &quot;GCP_API_KEY&quot; OR &quot;AZURE_CLIENT_SECRET&quot; OR &quot;TOKEN&quot;)">Cloud Service API Tokens in JavaScript Files</a></li>
+        <!-- Add the rest of your dorks here in a similar fashion -->
+    </ul>
 
     <script>
-        const dorkCategories = {
-            "Staging Environments": [
-                'site:{{DOMAIN}} -www inurl:staging | inurl:dev | inurl:test | inurl:preprod | inurl:internal'
-            ],
-            "Logs and Debug Information": [
-                'site:{{DOMAIN}} inurl:"/logs/" | inurl:"debug.log" | inurl:"error.log" "index of"'
-            ],
-            "Git Directories": [
-                'site:{{DOMAIN}} inurl:"/.git" "index of" | inurl:"/.env"'
-            ],
-            "Directory Listings": [
-                'site:{{DOMAIN}} intitle:"index of" "uploads" | "files" | "private" | "userdata"'
-            ],
-            "JIRA Tickets": [
-                'site:{{DOMAIN}} inurl:"/jira/" "exception" | "error" | "stack trace"'
-            ],
-            "Sensitive Files": [
-                'site:{{DOMAIN}} inurl:".ssh" | inurl:".aws" | inurl:".npmrc" | inurl:".docker" | inurl:".gitlab-ci.yml"'
-            ],
-            "Error Logs": [
-                'site:{{DOMAIN}} filetype:log "error" | "warning" | "failed to" -example -sample'
-            ],
-            "Kubernetes Configurations": [
-                'site:{{DOMAIN}} ext:yaml "kubernetes" | "cluster" | "apiVersion"'
-            ]
-        };
+        document.getElementById("replaceButton").addEventListener("click", function() {
+            var domain = document.getElementById("domainInput").value.trim();
+            var links = document.querySelectorAll("#dorkList a");
 
-        document.getElementById('replaceButton').addEventListener('click', function() {
-            const domain = document.getElementById('domainInput').value.trim();
-            const dorkListContainer = document.getElementById('dorkListContainer');
-            dorkListContainer.innerHTML = '';
-
-            if (domain) {
-                for (const [category, dorks] of Object.entries(dorkCategories)) {
-                    const categoryDiv = document.createElement('div');
-                    categoryDiv.className = 'dork-category';
-                    const categoryHeading = document.createElement('h2');
-                    categoryHeading.innerText = category;
-                    categoryDiv.appendChild(categoryHeading);
-
-                    const dorkList = document.createElement('div');
-                    dorkList.className = 'dork-list';
-
-                    dorks.forEach(dork => {
-                        const updatedDork = dork.replace(/{{DOMAIN}}/g, domain);
-                        const dorkItem = document.createElement('div');
-                        dorkItem.className = 'dork-item';
-                        dorkItem.innerText = updatedDork;
-                        dorkItem.onclick = function() {
-                            window.open(`https://www.google.com/search?q=${encodeURIComponent(updatedDork)}`, '_blank');
-                        };
-                        dorkList.appendChild(dorkItem);
-                    });
-
-                    categoryDiv.appendChild(dorkList);
-                    dorkListContainer.appendChild(categoryDiv);
-                }
-            } else {
-                alert('Please enter a domain name.');
-            }
+            links.forEach(function(link) {
+                var dork = link.getAttribute("data-dork").replace(/targetdomain.com/g, domain).replace(/www.targetdomain.com/g, domain);
+                link.setAttribute("href", "https://www.google.com/search?q=" + encodeURIComponent(dork));
+                link.textContent = dork;
+            });
         });
     </script>
-
 </body>
 </html>
